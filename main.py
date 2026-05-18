@@ -196,7 +196,6 @@ async def get_metal(message: Message, state: FSMContext):
         metal = metal.replace("(3а)", "3а")
 
         metal = metal.strip()
-    )
 
     # ЕСЛИ ЧЕЛОВЕК НАЖАЛ КНОПКУ МЕНЮ
     if "история" in metal:
