@@ -252,7 +252,7 @@ async def get_weight(message: Message, state: FSMContext):
 
     await message.answer(
         f"✅ РАСЧЁТ ГОТОВ\n\n"
-        f"🔩 Металл: {metal.capitalize()}\n"
+        f"🔩 Металл: {metal.upper()}\n"
         f"⚖️ Вес: {weight} кг\n"
         f"💰 Цена за кг: {price_per_kg} ₽\n"
         f"💵 Итоговая стоимость: {total:.2f} ₽"
