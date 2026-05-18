@@ -2,11 +2,17 @@ import asyncio
 import os
 import sqlite3
 
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import (
+    Message,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    CallbackQuery
+)
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from dotenv import load_dotenv
 
@@ -32,6 +38,32 @@ CREATE TABLE IF NOT EXISTS history (
 """)
 
 conn.commit()
+
+metals_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+
+        [InlineKeyboardButton(
+            text="🟠 Медь",
+            callback_data="metal_медь"
+        )],
+
+        [InlineKeyboardButton(
+            text="⚪ Алюминий",
+            callback_data="metal_алюминий"
+        )],
+
+        [InlineKeyboardButton(
+            text="♻️ Чёрный металл (3А)",
+            callback_data="metal_3а"
+        )],
+
+        [InlineKeyboardButton(
+            text="🔧 Нержавейка",
+            callback_data="metal_нержавейка"
+        )],
+
+    ]
+)
 
 # FSM СОСТОЯНИЯ
 class CalcMetal(StatesGroup):
@@ -124,7 +156,9 @@ async def calc_price(message: Message, state: FSMContext):
     await state.set_state(CalcMetal.metal)
 
     await message.answer(
-    "🔩 Введите тип металла:\n\n"
+    "🔩 Выберите металл:\n\n"
+    reply_markup=metals_kb
+)
 
     "♻️ ЧЕРНЫЙ МЕТАЛЛ:\n"
     "• 3а\n"
@@ -462,6 +496,21 @@ async def main():
         f"⚖️ Вес: {weight} кг\n"
         f"💰 Стоимость: {price:.2f} ₽"
     )
+
+    @dp.callback_query(F.data.startswith("metal_"))
+    async def select_metal(callback: CallbackQuery, state: FSMContext):
+
+        metal = callback.data.replace("metal_", "")
+
+        await state.update_data(metal=metal)
+
+        await state.set_state(CalcMetal.weight)
+
+        await callback.message.answer(
+            "⚖️ Теперь введите вес:"
+        )
+
+        await callback.answer()
 
 if __name__ == "__main__":
     asyncio.run(main())
