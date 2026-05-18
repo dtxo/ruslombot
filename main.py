@@ -1,33 +1,92 @@
 import asyncio
 import os
-import ssl
-import certifi
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from dotenv import load_dotenv
 
 load_dotenv()
 
 TOKEN = os.getenv("BOT_TOKEN")
 
-ssl_context = ssl.create_default_context(cafile=certifi.where())
-
-bot = Bot(
-    token=TOKEN
-)
-
+bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 
+# ГЛАВНОЕ МЕНЮ
+main_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="📄 Прайс-лист")],
+        [KeyboardButton(text="⚖️ Расчёт стоимости металлолома")],
+        [KeyboardButton(text="📏 Расчёт массы изделия")],
+        [KeyboardButton(text="ℹ️ Информация о компании")],
+        [KeyboardButton(text="🕘 История расчётов")]
+    ],
+    resize_keyboard=True
+)
+
+
+# START
 @dp.message(CommandStart())
 async def start(message: Message):
+    text = (
+        "👋 Приветствуем вас в РусЛом-Калькулятор!\n\n"
+        "Я помогу вам узнать актуальные цены "
+        "на металлолом, рассчитать стоимость "
+        "и массу изделий, а также предоставлю "
+        "справочную информацию о нашей компании.\n\n"
+        "👇 Выберите нужный раздел:"
+    )
+
     await message.answer(
-        "Добро пожаловать в РусЛом-Калькулятор!"
+        text,
+        reply_markup=main_keyboard
     )
 
 
+# ПРАЙС
+@dp.message(F.text == "📄 Прайс-лист")
+async def price_list(message: Message):
+    await message.answer(
+        "💰 Актуальные цены на металл будут добавлены позже."
+    )
+
+
+# РАСЧЕТ СТОИМОСТИ
+@dp.message(F.text == "⚖️ Расчёт стоимости металлолома")
+async def calc_price(message: Message):
+    await message.answer(
+        "⚖️ Функция расчёта стоимости скоро будет доступна."
+    )
+
+
+# РАСЧЕТ МАССЫ
+@dp.message(F.text == "📏 Расчёт массы изделия")
+async def calc_weight(message: Message):
+    await message.answer(
+        "📏 Функция расчёта массы скоро будет доступна."
+    )
+
+
+# ИНФОРМАЦИЯ
+@dp.message(F.text == "ℹ️ Информация о компании")
+async def info(message: Message):
+    await message.answer(
+        "🏢 РусЛом — компания по приему и переработке металлолома."
+    )
+
+
+# ИСТОРИЯ
+@dp.message(F.text == "🕘 История расчётов")
+async def history(message: Message):
+    await message.answer(
+        "📂 История расчётов пока пуста."
+    )
+
+
+# ЗАПУСК
 async def main():
     print("Бот запущен...")
     await dp.start_polling(bot)
