@@ -148,21 +148,25 @@ async def get_metal(message: Message, state: FSMContext):
 
     metal = message.text.lower().strip()
 
-    # ЕСЛИ ЧЕЛОВЕК НАЖАЛ МЕНЮ
+    # ЕСЛИ ЧЕЛОВЕК НАЖАЛ КНОПКУ МЕНЮ
     if "история" in metal:
         await state.clear()
+        await history(message)
         return
 
     if "прайс" in metal:
         await state.clear()
+        await price_list(message)
         return
 
     if "информация" in metal:
         await state.clear()
+        await about_company(message)
         return
 
     if "массы" in metal:
         await state.clear()
+        await calc_weight(message, state)
         return
 
     prices = {
