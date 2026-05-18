@@ -284,9 +284,6 @@ async def get_length(message: Message, state: FSMContext):
         return
 
     try:
-        length = float(message.text)
-
-    try:
         length = float(message.text.replace(",", "."))
 
     except:
