@@ -386,12 +386,12 @@ async def history(message: Message):
 
         text += (
             f"{i}️⃣ {metal.capitalize()} — {price:.2f} ₽\n"
-            f"ID расчёта: {calc_id}\n\n"
+            f"Номер расчёта: {calc_id}\n\n"
         )
 
     text += (
         "📌 Чтобы открыть расчёт,\n"
-        "введите ID расчёта."
+        "введите номер расчёта."
     )
 
     await message.answer(text)
@@ -402,12 +402,13 @@ async def main():
     print("Бот запущен...")
     await dp.start_polling(bot)
 
-# ОТКРЫТИЕ РАСЧЕТА ПО ID
+# ОТКРЫТИЕ РАСЧЕТА ПО НОМЕРУ
 @dp.message(F.text.regexp(r"^\d+$"))
 async def open_history(message: Message, state: FSMContext):
 
     current_state = await state.get_state()
 
+    # ЕСЛИ ЧЕЛОВЕК В FSM — НЕ МЕШАЕМ
     if current_state is not None:
         return
 
@@ -420,8 +421,7 @@ async def open_history(message: Message, state: FSMContext):
 
     row = cursor.fetchone()
 
-    if not row:
-        await message.answer("❌ Расчёт не найден.")
+    if row is None:
         return
 
     metal, weight, price = row
