@@ -291,10 +291,7 @@ async def get_weight(message: Message, state: FSMContext):
         reply_markup=ReplyKeyboardRemove()
     )
 
-await message.answer(
-    "📋 Главное меню:",
-    reply_markup=menu
-)
+
 
 
 # РАСЧЕТ МАССЫ ИЗДЕЛИЯ
