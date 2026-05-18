@@ -176,26 +176,21 @@ async def get_metal(message: Message, state: FSMContext):
         await start(message)
         return
 
-        metal = message.text.lower()
+       metal = message.text.lower()
 
-        metal = metal.replace("🟠", "")
-        metal = metal.replace("⚪", "")
-        metal = metal.replace("♻️", "")
-        metal = metal.replace("🔧", "")
-        metal = metal.replace("🟡", "")
-        metal = metal.replace("🥉", "")
-        metal = metal.replace("⚙️", "")
-        metal = metal.replace("🪙", "")
-        metal = metal.replace("🔶", "") 
-        metal = metal.replace("♨️", "")
-        metal = metal.replace("📻", "")
-        metal = metal.replace("🔋", "")
-        metal = metal.replace("🚗", "")
-        metal = metal.replace("⬅️", "")
+    for symbol in [
+        "🟠", "⚪", "♻️", "🔧", "🟡",
+        "🥉", "⚙️", "🪙", "🔶", "♨️",
+        "📻", "🔋", "🚗", "⬅️"
+    ]:
+        metal = metal.replace(symbol, "")
 
-        metal = metal.replace("(3а)", "3а")
+    metal = metal.replace("(", "")
+    metal = metal.replace(")", "")
 
-        metal = metal.strip()
+    metal = metal.strip()
+
+    print(f"METAL = [{metal}]")
 
     # ЕСЛИ ЧЕЛОВЕК НАЖАЛ КНОПКУ МЕНЮ
     if "история" in metal:
