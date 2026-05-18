@@ -296,8 +296,6 @@ await message.answer(
     reply_markup=menu
 )
 
-    await state.clear()
-
 
 # РАСЧЕТ МАССЫ ИЗДЕЛИЯ
 @dp.message(F.text == "📏 Расчёт массы изделия")
