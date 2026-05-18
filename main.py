@@ -187,8 +187,11 @@ async def get_metal(message: Message, state: FSMContext):
 
     metal = metal.replace("(", "")
     metal = metal.replace(")", "")
+    metal = metal.replace("ё", "е")
 
     metal = metal.strip()
+
+    metal = metal.replace("черный металл", "").strip()
 
     print(f"METAL = [{metal}]")
 
@@ -205,12 +208,12 @@ async def get_metal(message: Message, state: FSMContext):
 
     if "информация" in metal:
         await state.clear()
-        await about_company(message)
+        await info(message)
         return
 
     if "массы" in metal:
         await state.clear()
-        await calc_weight(message, state)
+        await calc_weight_start(message, state)
         return
 
     prices = {
@@ -237,7 +240,7 @@ async def get_metal(message: Message, state: FSMContext):
     "медь лужёная": 300,
     "медные радиаторы": 350,
     "радиаторы латунь": 220,
-    "аккумуляторы": 50,
+    "аккумуляторы": 50
 }
 
     print(metal)
@@ -266,7 +269,7 @@ async def get_weight(message: Message, state: FSMContext):
     try:
         weight = float(message.text.replace(",", "."))
 
-    except:
+    except ValueError:
         await message.answer("❌ Введите число.")
         return
 
@@ -334,7 +337,7 @@ async def get_length(message: Message, state: FSMContext):
 
     if "информация" in text:
         await state.clear()
-        await about_company(message)
+        await info(message)
         return
 
     if "стоимости" in text:
