@@ -104,6 +104,14 @@ async def start(message: Message):
         reply_markup=main_keyboard
     )
 
+    # КНОПКА НАЗАД
+@dp.message(F.text == "⬅️ Назад")
+async def back_to_menu(message: Message, state: FSMContext):
+
+    await state.clear()
+
+    await start(message)
+
 
 # ПРАЙС
 @dp.message(F.text == "📄 Прайс-лист")
@@ -194,14 +202,6 @@ async def get_metal(message: Message, state: FSMContext):
         await state.clear()
         await history(message)
         return
-
-        # НАЗАД В ГЛАВНОЕ МЕНЮ
-    @dp.message(F.text == "⬅️ Назад")
-    async def back_to_menu(message: Message, state: FSMContext):
-
-        await state.clear()
-
-        await start(message)
 
     if "прайс" in metal:
         await state.clear()
@@ -295,7 +295,7 @@ async def get_weight(message: Message, state: FSMContext):
         f"⚖️ Вес: {weight} КГ\n"
         f"💰 Цена за кг: {price_per_kg} ₽\n"
         f"💵 Итоговая стоимость: {total:.2f} ₽",
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=main_keyboard
     )
 
     await state.clear()
@@ -453,72 +453,6 @@ async def history(message: Message):
 async def main():
     print("Бот запущен...")
     await dp.start_polling(bot)
-
-    # ЕСЛИ ЭТО НЕ ЧИСЛО - ПРОСТО ИГНОР
-    if not message.text.isdigit():
-        return
-
-    calc_id = int(message.text)
-
-    cursor.execute(
-        "SELECT metal, weight, price FROM history WHERE id=?",
-        (calc_id,)
-    )
-
-    row = cursor.fetchone()
-
-    if not row:
-        await message.answer("❌ Расчёт не найден.")
-        return
-
-    metal, weight, price = row
-
-    await message.answer(
-        f"📂 ДЕТАЛИ РАСЧЁТА\n\n"
-        f"🔩 Металл: {metal.capitalize()}\n"
-        f"⚖️ Вес: {weight} кг\n"
-        f"💰 Стоимость: {price:.2f} ₽"
-    )
-
-    if not message.text.isdigit():
-        return
-
-    calc_id = int(message.text)
-
-    cursor.execute(
-        "SELECT metal, weight, price FROM history WHERE id=?",
-        (calc_id,)
-    )
-
-    row = cursor.fetchone()
-
-    if not row:
-        await message.answer("❌ Расчёт не найден.")
-        return
-
-    metal, weight, price = row
-
-    await message.answer(
-        f"📂 ДЕТАЛИ РАСЧЁТА\n\n"
-        f"🔩 Металл: {metal.capitalize()}\n"
-        f"⚖️ Вес: {weight} кг\n"
-        f"💰 Стоимость: {price:.2f} ₽"
-    )
-
-    @dp.callback_query(F.data.startswith("metal_"))
-    async def select_metal(callback: CallbackQuery, state: FSMContext):
-
-        metal = callback.data.replace("metal_", "")
-
-        await state.update_data(metal=metal)
-
-        await state.set_state(CalcMetal.weight)
-
-        await callback.message.answer(
-            "⚖️ Теперь введите вес:"
-        )
-
-        await callback.answer()
 
 if __name__ == "__main__":
     asyncio.run(main())
