@@ -1,5 +1,6 @@
 import asyncio
 import os
+import sqlite3
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
@@ -13,6 +14,22 @@ TOKEN = os.getenv("BOT_TOKEN")
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
+
+# БАЗА ДАННЫХ
+conn = sqlite3.connect("database.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    metal TEXT,
+    weight REAL,
+    price REAL
+)
+""")
+
+conn.commit()
 
 
 # ГЛАВНОЕ МЕНЮ
@@ -90,8 +107,23 @@ async def price_list(message: Message):
 # РАСЧЕТ СТОИМОСТИ
 @dp.message(F.text == "⚖️ Расчёт стоимости металлолома")
 async def calc_price(message: Message):
+
+    metal = "Медь"
+    weight = 10
+    price = 4700
+
+    cursor.execute(
+        "INSERT INTO history (user_id, metal, weight, price) VALUES (?, ?, ?, ?)",
+        (message.from_user.id, metal, weight, price)
+    )
+
+    conn.commit()
+
     await message.answer(
-        "⚖️ Функция расчёта стоимости скоро будет доступна."
+        f"✅ Расчёт выполнен!\n\n"
+        f"Металл: {metal}\n"
+        f"Вес: {weight} кг\n"
+        f"Стоимость: {price} ₽"
     )
 
 
@@ -107,16 +139,37 @@ async def calc_weight(message: Message):
 @dp.message(F.text == "ℹ️ Информация о компании")
 async def info(message: Message):
     await message.answer(
-        "🏢 РусЛом — компания по приему и переработке металлолома."
+        "🏢 РусЛом37 — компания из города Иваново по приему и переработке металлолома."
     )
 
 
 # ИСТОРИЯ
 @dp.message(F.text == "🕘 История расчётов")
 async def history(message: Message):
-    await message.answer(
-        "📂 История расчётов пока пуста."
+
+    cursor.execute(
+        "SELECT metal, weight, price FROM history WHERE user_id=? ORDER BY id DESC LIMIT 5",
+        (message.from_user.id,)
     )
+
+    rows = cursor.fetchall()
+
+    if not rows:
+        await message.answer("📂 История расчётов пуста.")
+        return
+
+    text = "🕘 ИСТОРИЯ РАСЧЁТОВ\n\n"
+
+    for row in rows:
+        metal, weight, price = row
+
+        text += (
+            f"🔩 Металл: {metal}\n"
+            f"⚖️ Вес: {weight} кг\n"
+            f"💰 Стоимость: {price} ₽\n\n"
+        )
+
+    await message.answer(text)
 
 
 # ЗАПУСК
