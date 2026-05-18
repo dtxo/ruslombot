@@ -4,6 +4,8 @@ import sqlite3
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from dotenv import load_dotenv
@@ -30,6 +32,11 @@ CREATE TABLE IF NOT EXISTS history (
 """)
 
 conn.commit()
+
+# FSM СОСТОЯНИЯ
+class CalcMetal(StatesGroup):
+    metal = State()
+    weight = State()
 
 
 # ГЛАВНОЕ МЕНЮ
@@ -104,27 +111,92 @@ async def price_list(message: Message):
 
     await message.answer(text)
 
-# РАСЧЕТ СТОИМОСТИ
+# НАЧАЛО РАСЧЕТА
 @dp.message(F.text == "⚖️ Расчёт стоимости металлолома")
-async def calc_price(message: Message):
+async def calc_price(message: Message, state: FSMContext):
 
-    metal = "Медь"
-    weight = 10
-    price = 4700
+    await state.set_state(CalcMetal.metal)
 
+    await message.answer(
+        "🔩 Введите тип металла:\n\n"
+        "Например:\n"
+        "Медь\n"
+        "Алюминий\n"
+        "Латунь"
+    )
+
+
+# ВВОД МЕТАЛЛА
+@dp.message(CalcMetal.metal)
+async def get_metal(message: Message, state: FSMContext):
+
+    metal = message.text.lower()
+
+    prices = {
+        "медь": 470,
+        "алюминий": 90,
+        "латунь": 250,
+        "бронза": 250,
+        "свинец": 80,
+        "нержавейка": 70
+    }
+
+    if metal not in prices:
+        await message.answer("❌ Такого металла нет в прайсе.")
+        return
+
+    await state.update_data(
+        metal=metal,
+        price_per_kg=prices[metal]
+    )
+
+    await state.set_state(CalcMetal.weight)
+
+    await message.answer(
+        "⚖️ Теперь введите вес в килограммах:"
+    )
+
+
+# ВВОД ВЕСА
+@dp.message(CalcMetal.weight)
+async def get_weight(message: Message, state: FSMContext):
+
+    try:
+        weight = float(message.text.replace(",", "."))
+
+    except:
+        await message.answer("❌ Введите число.")
+        return
+
+    data = await state.get_data()
+
+    metal = data["metal"]
+    price_per_kg = data["price_per_kg"]
+
+    total = weight * price_per_kg
+
+    # СОХРАНЕНИЕ В БАЗУ
     cursor.execute(
         "INSERT INTO history (user_id, metal, weight, price) VALUES (?, ?, ?, ?)",
-        (message.from_user.id, metal, weight, price)
+        (
+            message.from_user.id,
+            metal,
+            weight,
+            total
+        )
     )
 
     conn.commit()
 
     await message.answer(
-        f"✅ Расчёт выполнен!\n\n"
-        f"Металл: {metal}\n"
-        f"Вес: {weight} кг\n"
-        f"Стоимость: {price} ₽"
+        f"✅ РАСЧЁТ ГОТОВ\n\n"
+        f"🔩 Металл: {metal.capitalize()}\n"
+        f"⚖️ Вес: {weight} кг\n"
+        f"💰 Цена за кг: {price_per_kg} ₽\n"
+        f"💵 Итоговая стоимость: {total:.2f} ₽"
     )
+
+    await state.clear()
 
 
 # РАСЧЕТ МАССЫ
