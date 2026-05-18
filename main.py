@@ -140,7 +140,7 @@ async def calc_price(message: Message, state: FSMContext):
 @dp.message(CalcMetal.metal)
 async def get_metal(message: Message, state: FSMContext):
 
-    metal = message.text.lower()
+    metal = message.text.lower().strip()
 
     prices = {
     "алюминий": 90,
@@ -157,6 +157,9 @@ async def get_metal(message: Message, state: FSMContext):
     "аккумуляторы": 50
     }
 
+    print(metal)
+    print(prices.keys())
+    
     if metal not in prices:
         await message.answer("❌ Такого металла нет в прайсе.")
         return
