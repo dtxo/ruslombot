@@ -176,25 +176,26 @@ async def get_metal(message: Message, state: FSMContext):
         await start(message)
         return
 
-    metal = (
-        message.text.lower()
-        .replace("🟠", "")
-        .replace("⚪", "")
-        .replace("♻️", "")
-        .replace("🔧", "")
-        .replace("🟡", "")
-        .replace("🥉", "")
-        .replace("⚙️", "")
-        .replace("🪙", "")
-        .replace("🔶", "")
-        .replace("♨️", "")
-        .replace("📻", "")
-        .replace("🔋", "")
-        .replace("🚗", "")
-        .replace("⬅️", "")
-        .replace("(", "")
-        .replace(")", "")
-        .strip()
+        metal = message.text.lower()
+
+        metal = metal.replace("🟠", "")
+        metal = metal.replace("⚪", "")
+        metal = metal.replace("♻️", "")
+        metal = metal.replace("🔧", "")
+        metal = metal.replace("🟡", "")
+        metal = metal.replace("🥉", "")
+        metal = metal.replace("⚙️", "")
+        metal = metal.replace("🪙", "")
+        metal = metal.replace("🔶", "") 
+        metal = metal.replace("♨️", "")
+        metal = metal.replace("📻", "")
+        metal = metal.replace("🔋", "")
+        metal = metal.replace("🚗", "")
+        metal = metal.replace("⬅️", "")
+
+        metal = metal.replace("(3а)", "3а")
+
+        metal = metal.strip()
     )
 
     # ЕСЛИ ЧЕЛОВЕК НАЖАЛ КНОПКУ МЕНЮ
@@ -219,6 +220,7 @@ async def get_metal(message: Message, state: FSMContext):
         return
 
     prices = {
+
     # ЧЕРНЫЙ МЕТАЛЛ
     "3а": 21.5,
     "5а": 21,
@@ -231,12 +233,17 @@ async def get_metal(message: Message, state: FSMContext):
 
     # ЦВЕТНОЙ МЕТАЛЛ
     "алюминий": 90,
+    "алюм. радиаторы авто": 70,
     "нержавейка": 70,
     "свинец": 80,
     "цам": 50,
     "латунь": 250,
     "бронза": 250,
-    "медь": 470
+    "медь": 470,
+    "медь лужёная": 300,
+    "медные радиаторы": 350,
+    "радиаторы латунь": 220,
+    "аккумуляторы": 50,
 }
 
     print(metal)
