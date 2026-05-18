@@ -158,8 +158,6 @@ async def calc_price(message: Message, state: FSMContext):
     await message.answer(
     "🔩 Выберите металл:\n\n"
     reply_markup=metals_kb
-)
-
     "♻️ ЧЕРНЫЙ МЕТАЛЛ:\n"
     "• 3а\n"
     "• 5а\n"
