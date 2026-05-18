@@ -159,7 +159,7 @@ async def get_metal(message: Message, state: FSMContext):
 
     print(metal)
     print(prices.keys())
-    
+
     if metal not in prices:
         await message.answer("❌ Такого металла нет в прайсе.")
         return
@@ -274,8 +274,34 @@ async def main():
     await dp.start_polling(bot)
 
 # ОТКРЫТИЕ РАСЧЕТА ПО ID
-@dp.message()
+@dp.message(F.text.regexp(r"^\d+$"))
 async def open_history(message: Message):
+
+    # ЕСЛИ ЭТО НЕ ЧИСЛО — ПРОСТО ИГНОР
+    if not message.text.isdigit():
+        return
+
+    calc_id = int(message.text)
+
+    cursor.execute(
+        "SELECT metal, weight, price FROM history WHERE id=?",
+        (calc_id,)
+    )
+
+    row = cursor.fetchone()
+
+    if not row:
+        await message.answer("❌ Расчёт не найден.")
+        return
+
+    metal, weight, price = row
+
+    await message.answer(
+        f"📂 ДЕТАЛИ РАСЧЁТА\n\n"
+        f"🔩 Металл: {metal.capitalize()}\n"
+        f"⚖️ Вес: {weight} кг\n"
+        f"💰 Стоимость: {price:.2f} ₽"
+    )
 
     if not message.text.isdigit():
         return
