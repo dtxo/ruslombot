@@ -266,6 +266,38 @@ async def get_metal(message: Message, state: FSMContext):
 @dp.message(CalcMetal.weight)
 async def get_weight(message: Message, state: FSMContext):
 
+    text = message.text.lower().strip()
+
+    if "назад" in text:
+        await state.clear()
+        await start(message)
+        return
+
+    if "прайс" in text:
+        await state.clear()
+        await price_list(message)
+        return
+
+    if "история" in text:
+        await state.clear()
+        await history(message)
+        return
+
+    if "информация" in text:
+        await state.clear()
+        await info(message)
+        return
+
+    if "массы" in text:
+        await state.clear()
+        await calc_weight_start(message, state)
+        return
+
+    if "стоимости" in text:
+        await state.clear()
+        await calc_price(message, state)
+        return
+
     try:
         weight = float(message.text.replace(",", "."))
 
