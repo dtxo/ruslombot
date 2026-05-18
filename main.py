@@ -176,7 +176,7 @@ async def get_metal(message: Message, state: FSMContext):
         await start(message)
         return
 
-       metal = message.text.lower()
+    metal = message.text.lower()
 
     for symbol in [
         "🟠", "⚪", "♻️", "🔧", "🟡",
