@@ -39,6 +39,12 @@ class CalcMetal(StatesGroup):
     weight = State()
 
 
+class CalcWeight(StatesGroup):
+    length = State()
+    width = State()
+    thickness = State()
+
+
 # ГЛАВНОЕ МЕНЮ
 main_keyboard = ReplyKeyboardMarkup(
     keyboard=[
@@ -218,12 +224,91 @@ async def get_weight(message: Message, state: FSMContext):
     await state.clear()
 
 
-# РАСЧЕТ МАССЫ
+# РАСЧЕТ МАССЫ ИЗДЕЛИЯ
 @dp.message(F.text == "📏 Расчёт массы изделия")
-async def calc_weight(message: Message):
+async def calc_weight_start(message: Message, state: FSMContext):
+
+    await state.set_state(CalcWeight.length)
+
     await message.answer(
-        "📏 Функция расчёта массы скоро будет доступна."
+        "📏 Введите длину листа в метрах:"
     )
+
+
+# ДЛИНА
+@dp.message(CalcWeight.length)
+async def get_length(message: Message, state: FSMContext):
+
+    try:
+        length = float(message.text.replace(",", "."))
+
+    except:
+        await message.answer("❌ Введите число.")
+        return
+
+    await state.update_data(length=length)
+
+    await state.set_state(CalcWeight.width)
+
+    await message.answer(
+        "📐 Введите ширину листа в метрах:"
+    )
+
+
+# ШИРИНА
+@dp.message(CalcWeight.width)
+async def get_width(message: Message, state: FSMContext):
+
+    try:
+        width = float(message.text.replace(",", "."))
+
+    except:
+        await message.answer("❌ Введите число.")
+        return
+
+    await state.update_data(width=width)
+
+    await state.set_state(CalcWeight.thickness)
+
+    await message.answer(
+        "📎 Введите толщину листа в миллиметрах:"
+    )
+
+
+# ТОЛЩИНА
+@dp.message(CalcWeight.thickness)
+async def get_thickness(message: Message, state: FSMContext):
+
+    try:
+        thickness = float(message.text.replace(",", "."))
+
+    except:
+        await message.answer("❌ Введите число.")
+        return
+
+    data = await state.get_data()
+
+    length = data["length"]
+    width = data["width"]
+
+    # перевод мм в метры
+    thickness_m = thickness / 1000
+
+    # плотность стали
+    density = 7850
+
+    # расчет массы
+    weight = length * width * thickness_m * density
+
+    await message.answer(
+        f"✅ РАСЧЁТ МАССЫ ГОТОВ\n\n"
+        f"📏 Длина: {length} м\n"
+        f"📐 Ширина: {width} м\n"
+        f"📎 Толщина: {thickness} мм\n\n"
+        f"⚖️ Масса изделия: {weight:.2f} кг"
+    )
+
+    await state.clear()
 
 
 # ИНФОРМАЦИЯ
