@@ -260,6 +260,32 @@ async def calc_weight_start(message: Message, state: FSMContext):
 @dp.message(CalcWeight.length)
 async def get_length(message: Message, state: FSMContext):
 
+    text = message.text.lower().strip()
+
+    # ПЕРЕКЛЮЧЕНИЕ МЕНЮ
+    if "история" in text:
+        await state.clear()
+        await history(message)
+        return
+
+    if "прайс" in text:
+        await state.clear()
+        await price_list(message)
+        return
+
+    if "информация" in text:
+        await state.clear()
+        await about_company(message)
+        return
+
+    if "стоимости" in text:
+        await state.clear()
+        await calc_price(message, state)
+        return
+
+    try:
+        length = float(message.text)
+
     try:
         length = float(message.text.replace(",", "."))
 
