@@ -161,6 +161,13 @@ async def calc_price(message: Message, state: FSMContext):
 @dp.message(CalcMetal.metal)
 async def get_metal(message: Message, state: FSMContext):
 
+    metal = message.text.lower().strip()
+
+    if "назад" in metal:
+        await state.clear()
+        await start(message)
+        return
+
     metal = (
         message.text.lower()
         .replace("🟠", "")
@@ -290,6 +297,8 @@ async def get_weight(message: Message, state: FSMContext):
         f"💵 Итоговая стоимость: {total:.2f} ₽",
         reply_markup=ReplyKeyboardRemove()
     )
+
+    await state.clear()
 
 
 
