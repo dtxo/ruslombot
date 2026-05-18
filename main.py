@@ -157,14 +157,6 @@ async def calc_price(message: Message, state: FSMContext):
     reply_markup=metals_kb
 )
 
-# НАЗАД В ГЛАВНОЕ МЕНЮ
-@dp.message(F.text == "⬅️ Назад")
-async def back_to_menu(message: Message, state: FSMContext):
-
-    await state.clear()
-
-    await start(message)
-    
 # ВВОД МЕТАЛЛА
 @dp.message(CalcMetal.metal)
 async def get_metal(message: Message, state: FSMContext):
@@ -195,6 +187,14 @@ async def get_metal(message: Message, state: FSMContext):
         await state.clear()
         await history(message)
         return
+
+        # НАЗАД В ГЛАВНОЕ МЕНЮ
+    @dp.message(F.text == "⬅️ Назад")
+    async def back_to_menu(message: Message, state: FSMContext):
+
+        await state.clear()
+
+        await start(message)
 
     if "прайс" in metal:
         await state.clear()
