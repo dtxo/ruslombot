@@ -15,6 +15,7 @@ from aiogram.types import (
 )
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from dotenv import load_dotenv
+from aiogram.types import ReplyKeyboardRemove
 
 load_dotenv()
 
@@ -274,12 +275,13 @@ async def get_weight(message: Message, state: FSMContext):
     conn.commit()
 
     await message.answer(
-        f"✅ РАСЧЁТ ГОТОВ\n\n"
-        f"🔩 Металл: {metal.upper()}\n"
-        f"⚖️ Вес: {weight} кг\n"
-        f"💰 Цена за кг: {price_per_kg} ₽\n"
-        f"💵 Итоговая стоимость: {total:.2f} ₽"
-    )
+    f"✅ РАСЧЁТ ГОТОВ\n\n"
+    f"🔩 Металл: {metal.upper()}\n"
+    f"⚖️ Вес: {weight} КГ\n"
+    f"💰 Цена за кг: {price_per_kg} ₽\n"
+    f"💵 Итоговая стоимость: {total:.2f} ₽",
+    reply_markup=ReplyKeyboardRemove()
+)
 
     await state.clear()
 
