@@ -368,8 +368,7 @@ async def info(message: Message):
 async def history(message: Message):
 
     cursor.execute(
-        "SELECT id, metal, price FROM history WHERE user_id=? ORDER BY id DESC LIMIT 10",
-        (message.from_user.id,)
+        "SELECT id, metal, weight, price FROM history ORDER BY id DESC"
     )
 
     rows = cursor.fetchall()
@@ -380,19 +379,14 @@ async def history(message: Message):
 
     text = "🕘 ИСТОРИЯ РАСЧЁТОВ\n\n"
 
-    for i, row in enumerate(rows, start=1):
+    for index, row in enumerate(rows, start=1):
 
-        calc_id, metal, price = row
+        calc_id, metal, weight, price = row
 
         text += (
-            f"{i}️⃣ {metal.capitalize()} — {price:.2f} ₽\n"
-            f"Номер расчёта: {calc_id}\n\n"
+            f"{index}️⃣ {metal.capitalize()} — {price:.2f} ₽\n"
+            f"⚖️ Вес: {weight} кг\n\n"
         )
-
-    text += (
-        "📌 Чтобы открыть расчёт,\n"
-        "введите номер расчёта."
-    )
 
     await message.answer(text)
 
@@ -401,37 +395,6 @@ async def history(message: Message):
 async def main():
     print("Бот запущен...")
     await dp.start_polling(bot)
-
-# ОТКРЫТИЕ РАСЧЕТА ПО НОМЕРУ
-@dp.message(F.text.regexp(r"^\d+$"))
-async def open_history(message: Message, state: FSMContext):
-
-    current_state = await state.get_state()
-
-    # ЕСЛИ ЧЕЛОВЕК В FSM — НЕ МЕШАЕМ
-    if current_state is not None:
-        return
-
-    calc_id = int(message.text)
-
-    cursor.execute(
-        "SELECT metal, weight, price FROM history WHERE id=?",
-        (calc_id,)
-    )
-
-    row = cursor.fetchone()
-
-    if row is None:
-        return
-
-    metal, weight, price = row
-
-    await message.answer(
-        f"📂 ДЕТАЛИ РАСЧЁТА\n\n"
-        f"🔩 Металл: {metal.capitalize()}\n"
-        f"⚖️ Вес: {weight} кг\n"
-        f"💰 Стоимость: {price:.2f} ₽"
-    )
 
     # ЕСЛИ ЭТО НЕ ЧИСЛО - ПРОСТО ИГНОР
     if not message.text.isdigit():
