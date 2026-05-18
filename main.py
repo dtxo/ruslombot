@@ -274,14 +274,14 @@ async def get_weight(message: Message, state: FSMContext):
 
     conn.commit()
 
- await message.answer(
-    f"✅ РАСЧЁТ ГОТОВ\n\n"
-    f"🔩 Металл: {metal.upper()}\n"
-    f"⚖️ Вес: {weight} КГ\n"
-    f"💰 Цена за кг: {price_per_kg} ₽\n"
-    f"💵 Итоговая стоимость: {total:.2f} ₽",
-    reply_markup=ReplyKeyboardRemove()
-)
+    await message.answer(
+        f"✅ РАСЧЁТ ГОТОВ\n\n"
+        f"🔩 Металл: {metal.upper()}\n"
+        f"⚖️ Вес: {weight} КГ\n"
+        f"💰 Цена за кг: {price_per_kg} ₽\n"
+        f"💵 Итоговая стоимость: {total:.2f} ₽",
+        reply_markup=ReplyKeyboardRemove()
+    )
 
 await message.answer(
     "📋 Главное меню:",
