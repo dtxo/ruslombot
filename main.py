@@ -160,7 +160,26 @@ async def calc_price(message: Message, state: FSMContext):
 @dp.message(CalcMetal.metal)
 async def get_metal(message: Message, state: FSMContext):
 
-    metal = message.text.lower().strip()
+    metal = (
+        message.text.lower()
+        .replace("🟠", "")
+        .replace("⚪", "")
+        .replace("♻️", "")
+        .replace("🔧", "")
+        .replace("🟡", "")
+        .replace("🥉", "")
+        .replace("⚙️", "")
+        .replace("🪙", "")
+        .replace("🔶", "")
+        .replace("♨️", "")
+        .replace("📻", "")
+        .replace("🔋", "")
+        .replace("🚗", "")
+        .replace("⬅️", "")
+        .replace("(", "")
+        .replace(")", "")
+        .strip()
+    )
 
     # ЕСЛИ ЧЕЛОВЕК НАЖАЛ КНОПКУ МЕНЮ
     if "история" in metal:
