@@ -39,30 +39,26 @@ CREATE TABLE IF NOT EXISTS history (
 
 conn.commit()
 
-metals_kb = InlineKeyboardMarkup(
-    inline_keyboard=[
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-        [InlineKeyboardButton(
-            text="🟠 Медь",
-            callback_data="metal_медь"
-        )],
-
-        [InlineKeyboardButton(
-            text="⚪ Алюминий",
-            callback_data="metal_алюминий"
-        )],
-
-        [InlineKeyboardButton(
-            text="♻️ Чёрный металл (3А)",
-            callback_data="metal_3а"
-        )],
-
-        [InlineKeyboardButton(
-            text="🔧 Нержавейка",
-            callback_data="metal_нержавейка"
-        )],
-
-    ]
+metals_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="🟠 Медь")],
+        [KeyboardButton(text="⚪ Алюминий")],
+        [KeyboardButton(text="♻️ Чёрный металл (3А)")],
+        [KeyboardButton(text="🔧 Нержавейка")],
+        [KeyboardButton(text="🟡 Латунь")],
+        [KeyboardButton(text="🥉 Бронза")],
+        [KeyboardButton(text="⚙️ Свинец")],
+        [KeyboardButton(text="🪙 ЦАМ")],
+        [KeyboardButton(text="🔶 Медь лужёная")],
+        [KeyboardButton(text="♨️ Медные радиаторы")],
+        [KeyboardButton(text="📻 Радиаторы латунь")],
+        [KeyboardButton(text="🔋 Аккумуляторы")],
+        [KeyboardButton(text="🚗 Алюм. радиаторы авто")],
+        [KeyboardButton(text="⬅️ Назад")]
+    ],
+    resize_keyboard=True
 )
 
 # FSM СОСТОЯНИЯ
