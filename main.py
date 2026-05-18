@@ -231,12 +231,12 @@ async def info(message: Message):
     )
 
 
-# ИСТОРИЯ
+# ИСТОРИЯ РАСЧЁТОВ
 @dp.message(F.text == "🕘 История расчётов")
 async def history(message: Message):
 
     cursor.execute(
-        "SELECT metal, weight, price FROM history WHERE user_id=? ORDER BY id DESC LIMIT 5",
+        "SELECT id, metal, price FROM history WHERE user_id=? ORDER BY id DESC LIMIT 10",
         (message.from_user.id,)
     )
 
@@ -248,14 +248,19 @@ async def history(message: Message):
 
     text = "🕘 ИСТОРИЯ РАСЧЁТОВ\n\n"
 
-    for row in rows:
-        metal, weight, price = row
+    for i, row in enumerate(rows, start=1):
+
+        calc_id, metal, price = row
 
         text += (
-            f"🔩 Металл: {metal}\n"
-            f"⚖️ Вес: {weight} кг\n"
-            f"💰 Стоимость: {price} ₽\n\n"
+            f"{i}️⃣ {metal.capitalize()} — {price:.2f} ₽\n"
+            f"ID расчёта: {calc_id}\n\n"
         )
+
+    text += (
+        "📌 Чтобы открыть расчёт,\n"
+        "введите ID расчёта."
+    )
 
     await message.answer(text)
 
@@ -265,6 +270,34 @@ async def main():
     print("Бот запущен...")
     await dp.start_polling(bot)
 
+# ОТКРЫТИЕ РАСЧЕТА ПО ID
+@dp.message()
+async def open_history(message: Message):
+
+    if not message.text.isdigit():
+        return
+
+    calc_id = int(message.text)
+
+    cursor.execute(
+        "SELECT metal, weight, price FROM history WHERE id=?",
+        (calc_id,)
+    )
+
+    row = cursor.fetchone()
+
+    if not row:
+        await message.answer("❌ Расчёт не найден.")
+        return
+
+    metal, weight, price = row
+
+    await message.answer(
+        f"📂 ДЕТАЛИ РАСЧЁТА\n\n"
+        f"🔩 Металл: {metal.capitalize()}\n"
+        f"⚖️ Вес: {weight} кг\n"
+        f"💰 Стоимость: {price:.2f} ₽"
+    )
 
 if __name__ == "__main__":
     asyncio.run(main())
